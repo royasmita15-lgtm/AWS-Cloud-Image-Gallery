@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS Cloud Image Gallery</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="container">
+    <header class="hero">
+      <p class="eyebrow">CLOUD COMPUTING PROJECT</p>
+      <h1>AWS Cloud Image Gallery</h1>
+      <p>Upload, store and view your images securely using Amazon S3.</p>
+      <div class="architecture">Flask Website <span>→</span> Amazon EC2 <span>→</span> Amazon S3</div>
+    </header>
+
+    <section class="upload-card">
+      <h2>Upload a new image</h2>
+      <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+        <input type="file" name="image" accept=".jpg,.jpeg,.png,.gif,.webp" required>
+        <button type="submit">Upload Image</button>
+      </form>
+      <small>JPG, JPEG, PNG, GIF or WEBP · Maximum 10 MB</small>
+    </section>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="message {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <section class="gallery-section">
+      <div class="section-heading">
+        <h2>Your Gallery</h2>
+        <span>{{ images|length }} image(s)</span>
+      </div>
+      {% if images %}
+        <div class="gallery">
+          {% for image in images %}
+            <article class="image-card">
+              <img src="{{ image.url }}" alt="Uploaded gallery image">
+              <form action="{{ url_for('delete') }}" method="POST" onsubmit="return confirm('Delete this image?');">
+                <input type="hidden" name="key" value="{{ image.key }}">
+                <button class="delete-button" type="submit">Delete</button>
+              </form>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="empty-state">No images yet. Upload your first image above.</div>
+      {% endif %}
+    </section>
+    <footer>Powered by Flask · Amazon EC2 · Amazon S3</footer>
+  </main>
+</body>
+</html>
